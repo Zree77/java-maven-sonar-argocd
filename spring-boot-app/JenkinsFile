@@ -19,6 +19,16 @@ pipeline {
         sh 'cd spring-boot-app && mvn clean package'
       }
     }
+ stage('SonarQube Analysis') {
+      steps {
+        script {
+            def scannerHome = tool 'sonarscanner'
+            withSonarQubeEnv('sonarqube') {
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-ec2-project -Dsonar.sources=src/"
+            }
+        }
+      }
+    }
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "zree7/spring-boot-app:${BUILD_NUMBER}"
