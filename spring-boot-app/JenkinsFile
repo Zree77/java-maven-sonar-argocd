@@ -56,6 +56,12 @@ stage('SonarQube Analysis') {
         GIT_USER_NAME = "Zree77"
     }
 
+  stage('Update Deployment File') {
+    environment {
+        GIT_REPO_NAME = "java-maven-sonar-argocd"
+        GIT_USER_NAME = "Zree77"
+    }
+
     steps {
         withCredentials([
             usernamePassword(
@@ -65,7 +71,11 @@ stage('SonarQube Analysis') {
             )
         ]) {
             sh '''
-                cd "$WORKSPACE"
+                rm -rf gitops-repo
+
+                git clone https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git gitops-repo
+
+                cd gitops-repo
 
                 git config user.email "zreeprojects@gmail.com"
                 git config user.name "${GIT_USER_NAME}"
@@ -78,12 +88,11 @@ stage('SonarQube Analysis') {
                     -m "Update Spring Boot image tag to ${BUILD_NUMBER} [skip ci]" \
                     || echo "No changes to commit"
 
-                git push \
-                    https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git \
-                    HEAD:main
+                git push origin HEAD:main
             '''
         }
     }
+}
 }
 }
 }
