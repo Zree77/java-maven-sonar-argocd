@@ -19,7 +19,7 @@ pipeline {
         sh 'cd spring-boot-app && mvn clean package'
       }
     }
- stage('SonarQube Analysis') {
+stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('sonarqube') {
             sh '''
